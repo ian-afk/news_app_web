@@ -25,6 +25,9 @@ function App() {
           <li>
             <NavLink to={"/news/tags"}>News by tags</NavLink>
           </li>
+          <li>
+            <NavLink to={"/adminpanel"}>Admin Panel</NavLink>
+          </li>
         </ul>
       </div>
       <Outlet />
@@ -39,6 +42,9 @@ function App() {
           <Route index element={<NewsList />} />
           <Route path="tags" element={<div>Tags</div>} />
           <Route path=":id" element={<NewsDetail />} />
+        </Route>
+        <Route path="/adminpanel" element={<div>Admin panel</div>}>
+          <Route index element={<div>HELLO FROM ADMIN</div>} />
         </Route>
       </Route>
     )
