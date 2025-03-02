@@ -8,9 +8,9 @@ import {
   RouterProvider,
   NavLink,
 } from "react-router-dom";
-import NewsPage from "./components/pages/news/NewsPage";
-import NewsList from "./components/pages/news/NewsList";
-import NewsDetail from "./components/pages/news/NewsDetail";
+import NewsPage from "./pages/news/NewsPage";
+import NewsList from "./pages/news/NewsList";
+import NewsDetail from "./pages/news/NewsDetail";
 function App() {
   const AppLayout = () => (
     <>
