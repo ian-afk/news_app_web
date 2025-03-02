@@ -11,6 +11,7 @@ import {
 import NewsPage from "./pages/news/NewsPage";
 import NewsList from "./pages/news/NewsList";
 import NewsDetail from "./pages/news/NewsDetail";
+import NewsTags from "./pages/news/NewsTags";
 function App() {
   const AppLayout = () => (
     <>
@@ -40,7 +41,7 @@ function App() {
 
         <Route path="/news" element={<NewsPage />}>
           <Route index element={<NewsList />} />
-          <Route path="tags" element={<div>Tags</div>} />
+          <Route path="tags" element={<NewsTags />} />
           <Route path=":id" element={<NewsDetail />} />
         </Route>
         <Route path="/adminpanel" element={<div>Admin panel</div>}>

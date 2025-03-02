@@ -25,3 +25,16 @@ export const getNews = async (id) => {
   console.log(res.data);
   return res.data;
 };
+
+export const getListTags = async () => {
+  const res = await api.get(`/api/tags/`);
+  return res.data;
+};
+
+export const getNewsByTag = async (tagId) => {
+  console.log(tagId);
+  const res = await api.get(`/api/tags/news/${tagId}`, {
+    params: { tagId: tagId },
+  });
+  return res.data;
+};

@@ -8,7 +8,7 @@ function NewsCards({ id, title, description, tags }) {
   return (
     <div>
       <div
-        className="bg-white rounded-lg shadow-sm border-1 border-red-500"
+        className="bg-white rounded-lg shadow-sm border-1"
         onClick={() => handleClick(id)}
         key={`news-${id}`}
       >
