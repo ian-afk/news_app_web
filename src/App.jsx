@@ -12,22 +12,37 @@ import NewsPage from "./pages/news/NewsPage";
 import NewsList from "./pages/news/NewsList";
 import NewsDetail from "./pages/news/NewsDetail";
 import NewsTags from "./pages/news/NewsTags";
+import AdminPanel from "./pages/AdminPanel";
+import Statistics from "./pages/Statistics";
 function App() {
+  const getNavClass = ({ isActive }) =>
+    isActive
+      ? "text-blue-500 font-bold border-b-2 border-blue-500"
+      : "text-gray-700 font-bold";
+
   const AppLayout = () => (
     <>
       <div>
         <ul className="flex space-x-2">
           <li>
-            <NavLink to={"/"}>Home</NavLink>
+            <NavLink to={"/"} className={getNavClass}>
+              Statistics
+            </NavLink>
           </li>
           <li>
-            <NavLink to={"/news"}>News</NavLink>
+            <NavLink to={"/news"} end className={getNavClass}>
+              News
+            </NavLink>
           </li>
           <li>
-            <NavLink to={"/news/tags"}>News by tags</NavLink>
+            <NavLink to={"/news/tags"} className={getNavClass}>
+              News by tags
+            </NavLink>
           </li>
           <li>
-            <NavLink to={"/adminpanel"}>Admin Panel</NavLink>
+            <NavLink to={"/adminpanel"} className={getNavClass}>
+              Admin Panel
+            </NavLink>
           </li>
         </ul>
       </div>
@@ -37,14 +52,14 @@ function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route element={<AppLayout />}>
-        <Route path="/" element={<div>INDEX</div>}></Route>
+        <Route path="/" element={<Statistics />}></Route>
 
         <Route path="/news" element={<NewsPage />}>
           <Route index element={<NewsList />} />
           <Route path="tags" element={<NewsTags />} />
           <Route path=":id" element={<NewsDetail />} />
         </Route>
-        <Route path="/adminpanel" element={<div>Admin panel</div>}>
+        <Route path="/adminpanel" element={<AdminPanel />}>
           <Route index element={<div>HELLO FROM ADMIN</div>} />
         </Route>
       </Route>
