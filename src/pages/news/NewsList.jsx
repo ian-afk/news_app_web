@@ -1,12 +1,16 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import NewsCards from "../../components/NewsCards";
 import { useInView } from "react-intersection-observer";
-import { getListNews } from "../../utils/api";
+import { getListNews, likeDislike } from "../../utils/api";
 
 function NewsList() {
   const { ref, inView } = useInView({});
-
+  const [newsId, setNewsId] = useState(null);
   const {
     data: fetchNews,
     error: errorNews,
@@ -26,7 +30,22 @@ function NewsList() {
       return undefined;
     },
   });
+  const queryClient = useQueryClient();
+  const { mutate: mutateLikeDis, isSuccess } = useMutation({
+    mutationFn: ({ id, body }) => likeDislike(id, body),
+  });
+  useEffect(() => {
+    if (isSuccess) {
+      console.log("success ba?");
+      queryClient.invalidateQueries({ queryKey: ["getListNews"] });
+    }
+  }, [isSuccess]);
 
+  const handleLike = (isLike, id) => {
+    setNewsId(id);
+    mutateLikeDis({ id, body: { isLike } });
+    console.log("got called");
+  };
   console.log(fetchNews);
   if (errorNews && !isLoadingNews) {
     return <div>An error occurred</div>;
@@ -39,12 +58,17 @@ function NewsList() {
         description={item.description}
         tags={item.tags}
         title={item.title}
+        images={item.images}
+        dislikes={item.dislikes}
+        likes={item.likes}
+        views={item.views}
+        ld={handleLike}
         key={item._id}
       />
     ))
   );
 
-  if (statusNews === "pending") {
+  if (statusNews === "pending" || isLoadingNews) {
     content = <p>Loading...</p>;
   }
 
