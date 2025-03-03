@@ -62,6 +62,10 @@ function NewsTags() {
             tags={item.tags}
             title={item.title}
             key={item._id}
+            images={item.images}
+            likes={item.likes}
+            dislikes={item.dislikes}
+            views={item.views}
           />
         ))}
       </>
