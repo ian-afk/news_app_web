@@ -38,3 +38,33 @@ export const getNewsByTag = async (tagId) => {
   });
   return res.data;
 };
+
+export const addNews = async (body) => {
+  console.log(body);
+  const res = await api.post(`/api/news/`, body, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  console.log(res);
+  return res.data;
+};
+
+// likes and dislikes api
+export const likeDislike = async (id, body) => {
+  console.log(id);
+  const res = await api.patch(`/api/news/likedis/${id}`, body);
+  return res.data;
+};
+
+export const deleteNews = async (id) => {
+  const res = await api.delete(`/api/news/${id}`, {
+    params: { id },
+  });
+  return res.data;
+};
+
+export const getStatistics = async () => {
+  const res = await api.get(`/api/statistics`);
+  return res.data;
+};
