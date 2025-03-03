@@ -1,9 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
-import { getListTags, getNewsByTag } from "../../utils/api";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { getListTags, getNewsByTag, likeDislike } from "../../utils/api";
 import TagsCard from "../../components/TagsCard";
 import NewsCards from "../../components/NewsCards";
 import { useEffect, useState } from "react";
 import { MdArrowBackIos } from "react-icons/md";
+import { useInView } from "react-intersection-observer";
 
 function NewsTags() {
   const [showNews, setShowNews] = useState(false);
@@ -11,6 +17,8 @@ function NewsTags() {
     id: "",
     tagName: "",
   });
+  const { ref, inView } = useInView({});
+  const [newsId, setNewsId] = useState(null);
   const {
     data: fetchTags,
     isLoading,
@@ -23,16 +31,25 @@ function NewsTags() {
 
   const {
     data: fetchNews,
-    refetch,
-    isFetching,
-    isError: isErrorNews,
     error: errorNews,
-  } = useQuery({
+    status: statusNews,
+    isLoading: isLoadingNews,
+    isError: isErrorNews,
+    refetch,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+  } = useInfiniteQuery({
     queryKey: ["getNewsByTag", tag.id],
     queryFn: () => getNewsByTag(tag.id),
-    enabled: false,
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.totalPages) {
+        return lastPage.page + 1;
+      }
+      return undefined;
+    },
   });
-
   const handleShowNews = ({ id, tag }) => {
     setTag({
       id,
@@ -40,39 +57,74 @@ function NewsTags() {
     });
     setShowNews(!showNews);
   };
+  const queryClient = useQueryClient();
+  const { mutate: mutateLikeDis, isSuccess } = useMutation({
+    mutationFn: ({ id, body }) => likeDislike(id, body),
+  });
+
+  useEffect(() => {
+    if (isSuccess) {
+      console.log("sucess");
+      queryClient.invalidateQueries({ queryKey: ["getNewsByTag"] });
+    }
+  }, [isSuccess]);
+
+  const handleLike = (isLike, id) => {
+    setNewsId(id);
+    mutateLikeDis({ id, body: { isLike } });
+    console.log("got called");
+  };
 
   useEffect(() => {
     if (tag.id) refetch();
   }, [tag.id]);
 
+  console.log(fetchNews);
   let newsContent = <></>;
-  if (isFetching) {
-    newsContent = <div>Loading...</div>;
-  } else if (isErrorNews) {
-    newsContent = <div>{errorNews}</div>;
-  } else if (fetchNews?.docs?.length > 0) {
-    const data = fetchNews.docs;
-    console.log(data);
-    newsContent = (
-      <>
-        {data.map((item) => (
-          <NewsCards
-            description={item.description}
-            id={item._id}
-            tags={item.tags}
-            title={item.title}
-            key={item._id}
-            images={item.images}
-            likes={item.likes}
-            dislikes={item.dislikes}
-            views={item.views}
-          />
-        ))}
-      </>
-    );
-  } else {
-    newsContent = <div>No news found.</div>;
-  }
+  newsContent = fetchNews?.pages.map((news) =>
+    news.docs.map((item, index) => (
+      <NewsCards
+        id={item._id}
+        description={item.description}
+        tags={item.tags}
+        title={item.title}
+        images={item.images}
+        dislikes={item.dislikes}
+        likes={item.likes}
+        views={item.views}
+        ld={handleLike}
+        key={item._id}
+      />
+    ))
+  );
+  // if (isLoadingNews) {
+  //   newsContent = <div>Loading...</div>;
+  // } else if (isErrorNews) {
+  //   newsContent = <div>{errorNews}</div>;
+  // } else if (fetchNews?.docs?.length > 0) {
+  //   const data = fetchNews.docs;
+  //   console.log(data);
+  //   newsContent = (
+  //     <>
+  //       {data.map((item) => (
+  //         <NewsCards
+  //           description={item.description}
+  //           id={item._id}
+  //           tags={item.tags}
+  //           title={item.title}
+  //           key={item._id}
+  //           images={item.images}
+  //           likes={item.likes}
+  //           dislikes={item.dislikes}
+  //           views={item.views}
+  //           ld={handleLike}
+  //         />
+  //       ))}
+  //     </>
+  //   );
+  // } else {
+  //   newsContent = <div>No news found.</div>;
+  // }
   let content = <></>;
   if (isLoading) {
   } else if (isError) {
@@ -108,6 +160,11 @@ function NewsTags() {
             <h3></h3>
           </div>
           <div className="space-y-4">{newsContent}</div>
+          <div ref={ref}>
+            {isFetchingNextPage && (
+              <p className="text-2xl text-blue-500 text-center">Loading...</p>
+            )}
+          </div>
         </>
       ) : (
         <div className="grid grid-cols-10 gap-4">{content}</div>

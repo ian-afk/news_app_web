@@ -46,6 +46,7 @@ function App() {
           </li>
         </ul>
       </div>
+
       <Outlet />
     </>
   );
@@ -66,8 +67,10 @@ function App() {
     )
   );
   return (
-    <div className="m-4">
-      <RouterProvider router={router} />
+    <div className="mt-4 grid grid-cols-10 justify-center w-[70vw] mx-auto">
+      <div className="col-span-10 flex justify-center flex-col">
+        <RouterProvider router={router} />
+      </div>
     </div>
   );
 }
